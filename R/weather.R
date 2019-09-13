@@ -40,7 +40,7 @@
 #'
 #' Note that columns \code{begin} and \code{end} in the output are of class \code{Date}.
 #'
-#' @importFrom utils read.csv
+#' @importFrom utils read.csv setTxtProgressBar txtProgressBar
 #'
 #' @export
 NOAA_allStations <- function(force_retrieve=FALSE) {
@@ -49,7 +49,7 @@ NOAA_allStations <- function(force_retrieve=FALSE) {
   if (is.null(internal_state$NOAAsites) || force_retrieve) {
     message("Downloading list of weather stations from NOAA (waiting for server)... ")
     NOAAsites <- (function() {
-      sites <- read.csv("ftp://ftp@ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv",
+      sites <- read.csv("ftp://ftp.ncdc.noaa.gov/pub/data/noaa/isd-history.csv",
           stringsAsFactors=FALSE)
       names(sites) <- tolower(names(sites))
       sites
@@ -193,15 +193,15 @@ NOAA_getGSOD <- function(stations, years, match.columns="station.name", progress
   if (nstations<=3) progress <- FALSE
   if (progress) {
     i=0
-    pb <- tcltk::tkProgressBar("FluMoDL",
-        sprintf("Downloading %s files from NOAA via FTP...", nstations),
-        min=0, max=nstations, initial=0)
+    pb <- txtProgressBar(title = "FluMoDL",
+        label = sprintf("Downloading %s files from NOAA via FTP...", nstations),
+        min=0, max=nstations, initial=0, style=3)
   }
   t <- tempfile()
   res <- do.call(rbind, lapply(years, function(y) {
     files <- sprintf("ftp://ftp.ncdc.noaa.gov/pub/data/gsod/%s/%s-%s-%s.op.gz", y, stations$usaf, stations$wban, y)
     res <- do.call(rbind, lapply(files, function(f) {
-      if (progress) { i <<- i+1; tcltk::setTkProgressBar(pb, i) }
+      if (progress) { i <<- i+1; setTxtProgressBar(pb, i) }
       suppressWarnings({
         b <- try({download.file(f, t, quiet=TRUE)}, silent=TRUE)
       })
@@ -210,7 +210,8 @@ NOAA_getGSOD <- function(stations, years, match.columns="station.name", progress
                            widths=diff(c(0,6,12,22,30,33,41,44,52,55,63,66,73,76,83,86,93,100,108,109,116,117,123,124,130,138)),
                            col.names=c("usaf", "wban", "date", "temp", "tempC", "dewp", "dewpC", "slp", "slpC", "stp",
                                        "stpC", "visib", "visibC", "wdsp", "wdspC", "mxspd", "gust", "maxtemp", "maxtempF", "mintemp",
-                                       "mintempF", "prcp", "prcpF", "sndp", "frshtt")),
+                                       "mintempF", "prcp", "prcpF", "sndp", "frshtt"),
+                           colClasses=c("usaf"="character")),
                   silent = TRUE)
         if (class(bb)!="try-error") {
           return(bb)

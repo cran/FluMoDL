@@ -1,8 +1,8 @@
 Package: FluMoDL
 Type: Package
-Imports: stats, utils, splines, tcltk, tsModel
+Imports: stats, utils, splines, tsModel
 Title: Influenza-Attributable Mortality with Distributed-Lag Models
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: 
     c(person(given="Theodore", family="Lytras", 
              email="thlytras@gmail.com", role=c("aut","cre"), 
@@ -27,9 +27,9 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-07-25 11:32:06 UTC; bones
+Packaged: 2019-09-13 10:28:04 UTC; bones
 Author: Theodore Lytras [aut, cre] (<https://orcid.org/0000-0002-4146-4122>),
   Antonio Gasparrini [ctb] (<https://orcid.org/0000-0002-2271-3568>),
   Shuangcai Wang [ctb]
 Repository: CRAN
-Date/Publication: 2019-07-28 09:00:02 UTC
+Date/Publication: 2019-09-13 10:50:02 UTC

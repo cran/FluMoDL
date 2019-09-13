@@ -99,6 +99,8 @@
 #' \href{https://bmcmedresmethodol.biomedcentral.com/articles/10.1186/1471-2288-14-55}{BMC Med Res Methodol} 2014;14:55.
 #' }
 #'
+#' @importFrom utils read.csv setTxtProgressBar txtProgressBar
+#'
 #' @examples
 #' data(greece) # Use example surveillance data from Greece
 #' m <- with(greece, fitFluMoDL(deaths = daily$deaths,
@@ -212,12 +214,12 @@ attrMort <- function(m, par=c("H1","H3","B","temp","RSV"), sel="week", from=NULL
   if (!ci || length(selIndices)<=3) progress <- FALSE
   if (progress) {
     i=0
-    pb <- tcltk::tkProgressBar("FluMoDL",
-                               sprintf("Calculating for %s selections...", length(selIndices)),
-                               min=0, max=length(selIndices), initial=0)
+    pb <- txtProgressBar(title = "FluMoDL",
+                         label = sprintf("Calculating for %s selections...", length(selIndices)),
+                         min=0, max=length(selIndices), initial=0, style=3)
   }
   res <- lapply(selIndices, function(s) {
-    if (progress) { i <<- i+1; tcltk::setTkProgressBar(pb, i) }
+    if (progress) { i <<- i+1; setTxtProgressBar(pb, i) }
     p <- list()
     mc <- list()
     if ("temp" %in% par) {
@@ -243,7 +245,7 @@ attrMort <- function(m, par=c("H1","H3","B","temp","RSV"), sel="week", from=NULL
     }
     if ("RSV" %in% par) {
       basis.proxyRSV <- m$basis$proxyRSV
-      if (!is.null(blup) && !is.null(blup)$coef$proxyRSV) {
+      if (!is.null(blup) && !is.null(blup$coef$proxyRSV)) {
         p$RSV <- attrdl(m$data$proxyRSV, basis.proxyRSV, m$data$deaths,
                         coef=blup$coef$proxyRSV, vcov=blup$vcov$proxyRSV,
                         cen=0, type="an", sub=s)
@@ -261,7 +263,7 @@ attrMort <- function(m, par=c("H1","H3","B","temp","RSV"), sel="week", from=NULL
     }
     if ("B" %in% par) {
       basis.proxyB <- m$basis$proxyB
-      if (!is.null(blup) && !is.null(blup)$coef$proxyB) {
+      if (!is.null(blup) && !is.null(blup$coef$proxyB)) {
         p$FluB <- attrdl(m$data$proxyB, basis.proxyB, m$data$deaths,
                          coef=blup$coef$proxyB, vcov=blup$vcov$proxyB,
                          cen=0, type="an", sub=s)
@@ -279,7 +281,7 @@ attrMort <- function(m, par=c("H1","H3","B","temp","RSV"), sel="week", from=NULL
     }
     if ("H3" %in% par) {
       basis.proxyH3 <- m$basis$proxyH3
-      if (!is.null(blup) && !is.null(blup)$coef$proxyH3) {
+      if (!is.null(blup) && !is.null(blup$coef$proxyH3)) {
         p$FluH3 <- attrdl(m$data$proxyH3, basis.proxyH3, m$data$deaths,
                           coef=blup$coef$proxyH3, vcov=blup$vcov$proxyH3,
                           cen=0, type="an", sub=s)
@@ -297,7 +299,7 @@ attrMort <- function(m, par=c("H1","H3","B","temp","RSV"), sel="week", from=NULL
     }
     if ("H1" %in% par) {
       basis.proxyH1 <- m$basis$proxyH1
-      if (!is.null(blup) && !is.null(blup)$coef$proxyH1) {
+      if (!is.null(blup) && !is.null(blup$coef$proxyH1)) {
         p$FluH1 <- attrdl(m$data$proxyH1, basis.proxyH1, m$data$deaths,
                           coef=blup$coef$proxyH1, vcov=blup$vcov$proxyH1,
                           cen=0, type="an", sub=s)
@@ -324,7 +326,7 @@ attrMort <- function(m, par=c("H1","H3","B","temp","RSV"), sel="week", from=NULL
       )
     } else if (ci) {
       res <- round(c(sapply(rev(names(p)), function(n) {
-        c(p[[n]], quantile(mc[[n]], c(0.025, 0.975)))
+        c(p[[n]], quantile(mc[[n]], c(0.025, 0.975), na.rm=TRUE))
       })))
       names(res) <- paste0(rep(rev(names(p)),each=3), c("",".lo",".hi"))
     } else {
